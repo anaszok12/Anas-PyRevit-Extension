@@ -10,8 +10,8 @@ https://www.notion.so/pyRevit-bd907d6292ed4ce997c46e84b6ef67a0
 3. Insert parameters in generic annotation for window and door schedule
 
 # Credits
-https://github.com/eirannejad for this awesome PyRevit
-Custom packages as mentioned in the dynamo scripts
-Icons8 for the beautiful icons
+1. https://github.com/eirannejad for this awesome PyRevit
+2. Custom packages as mentioned in the dynamo scripts
+3. Icons8 for the beautiful icons
 
 Everything is still in progress
