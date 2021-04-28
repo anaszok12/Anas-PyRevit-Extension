@@ -1,0 +1,568 @@
+{
+  "Uuid": "121f28bf-611a-4a3b-9f6f-b13db29b13ce",
+  "IsCustomNode": false,
+  "Description": null,
+  "Name": "Enable_AnalyticalModel_script",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "\"\"\"\r\nFILTERED ELEMENT COLLECTOR - ANALYTICAL MODEL PARAMETER ELEMENTS ONLY\r\n\"\"\"\r\n__author__ = 'Sol Amour - sol.amour@designtech.io'\r\n__twitter__ = '@solamour'\r\n__copyright__ = 'designtech.io 2018'\r\n__version__ = '1.0.0'\r\n\r\n\r\n# Importing Reference Modules\r\nimport clr # CLR ( Common Language Runtime Module )\r\nclr.AddReference(\"RevitServices\") # Adding the RevitServices.dll special Dynamo module to deal with Revit\r\nimport RevitServices # Importing RevitServices\r\nfrom RevitServices.Persistence import DocumentManager # From RevitServices import the Document Manager\r\nclr.AddReference(\"RevitAPI\") # Adding the RevitAPI.dll module to access the Revit API\r\nimport Autodesk # Here we import the Autodesk namespace\r\n# From the Autodesk namespace - derived down to the Revit Database, we import only the Filtered Element Collector and BuiltInCategory classes\r\nfrom Autodesk.Revit.DB import *\r\n\r\n# Here we give the Revit Document a nickname of 'doc' which allows us to simply call 'doc' later without having to type the long namespace name \r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\n\r\n# Here we use the Built In Parameter method to choose the parameter (yes/no tickbox) of 'Enable Analytical Model' across all Elements inside of the Revit Document\r\nparam = BuiltInParameter.STRUCTURAL_ANALYTICAL_MODEL\r\n# Once we have our BuiltInParameter, we need to get it's Element Id and convert it to a Parameter Value Provider in order to use it inside of our filter\r\nprovider = ParameterValueProvider( ElementId( param ) )\r\n\r\n# We then set up an empty instance of a Filter Numeric Equals to test against a set value (In this case - whether or not the Element has the box ticked for 'Enable Analytical Model'\r\nevaluator = FilterNumericEquals()\r\n# After we have the empty instance set up as our evaluator, we run a Filter Integer Rule that checks the chosen parameter (Enable Anyalytical Model), runs against the evaluator (Does this Number equal) and our value (1 which correlates to the tick inside of our yes/no tickbox)\r\nrule = FilterIntegerRule( provider, evaluator, 0 )\r\n# After we have generated our Rule, we can generate a filter based off this rule\r\nfilter = ElementParameterFilter( rule )\r\n\r\n# Now we have a valid rule to run against our Filtered Element Collector. So in this case we pull everything inside the document - but only if it passes our filter (i.e has the box ticked on for 'Enable Analytical Model') then make sure we return the elements themselves. \r\nanalyticalCollector = FilteredElementCollector( doc ).WherePasses( filter ).ToElements()\r\n\r\n# To get our results back inside of Dynamo, we need to append a list to the OUT port\r\nOUT = analyticalCollector",
+      "VariableInputPorts": true,
+      "Id": "031e0a0131e640c5b5e202c5d31c1ef2",
+      "Inputs": [
+        {
+          "Id": "e6b9dfdf6677433dbabef43593b4b60b",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "1e571494878640a782a5d988187ce372",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded IronPython script."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Revit.Elements.Element.SetParameterByName@string,var",
+      "Id": "721e5e329afd46dbb8fd2ceea64ac188",
+      "Inputs": [
+        {
+          "Id": "b162303d12334230bd427a3f77adf78e",
+          "Name": "element",
+          "Description": "Revit.Elements.Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "98f12095b99c4b1aa45ba9552a549e53",
+          "Name": "parameterName",
+          "Description": "The name of the parameter to set.\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "aa46058f4cf5492fa1529d646691a373",
+          "Name": "value",
+          "Description": "The value.\n\nvar",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "bd88457c537b4f0c958be7c924c65385",
+          "Name": "Element",
+          "Description": "Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Set one of the element's parameters.\n\nElement.SetParameterByName (parameterName: string, value: var): Element"
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
+      "NodeType": "StringInputNode",
+      "InputValue": "Enable Analytical Model",
+      "Id": "50820e35ea4d4ac7add8cc3b05dc38d2",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "0d1b41b348d54d11995c2972e1df5f6c",
+          "Name": "",
+          "Description": "String",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Creates a string."
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Input.BoolSelector, CoreNodeModels",
+      "NodeType": "BooleanInputNode",
+      "InputValue": true,
+      "Id": "870e5d03bcc648d4862e9bafeccf94e8",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "656e7001b4e84c8fb7841b8dea51e7f9",
+          "Name": "",
+          "Description": "Boolean",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Selection between a true and false."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "1e571494878640a782a5d988187ce372",
+      "End": "b162303d12334230bd427a3f77adf78e",
+      "Id": "5283988215a8490f876e77589cd97781"
+    },
+    {
+      "Start": "0d1b41b348d54d11995c2972e1df5f6c",
+      "End": "98f12095b99c4b1aa45ba9552a549e53",
+      "Id": "b0103dfab8354ce18bf0d462f6966dd2"
+    },
+    {
+      "Start": "656e7001b4e84c8fb7841b8dea51e7f9",
+      "End": "aa46058f4cf5492fa1529d646691a373",
+      "Id": "b9a65cff4f1546f0b7139617bc46125c"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.6.1.8786",
+      "RunType": "Automatic",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "NodeViews": [
+      {
+        "ShowGeometry": true,
+        "Name": "Python Script",
+        "Id": "031e0a0131e640c5b5e202c5d31c1ef2",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 609.62094304214907,
+        "Y": 793.71568970159285
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Element.SetParameterByName",
+        "Id": "721e5e329afd46dbb8fd2ceea64ac188",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 905.56047340969224,
+        "Y": 795.50796128395461
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "String",
+        "Id": "50820e35ea4d4ac7add8cc3b05dc38d2",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 609.93107497513415,
+        "Y": 912.60980948662871
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Boolean",
+        "Id": "870e5d03bcc648d4862e9bafeccf94e8",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 612.789653553778,
+        "Y": 1001.2257454245832
+      }
+    ],
+    "Annotations": [
+      {
+        "Id": "94bff3f852594205bcae8b6cb9893274",
+        "Title": "License",
+        "Nodes": [
+          "2f09b5c5ebb0422aac731b86cdbedae5"
+        ],
+        "Left": 262.5,
+        "Top": 336.5,
+        "Width": 320.0,
+        "Height": 328.0,
+        "FontSize": 36.0,
+        "InitialTop": 389.5,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 43.0,
+        "Background": "#FF48B9FF"
+      },
+      {
+        "Id": "0317c4543f244852a43182b4d31a4ad0",
+        "Title": "ENABLE ANALYTICAL MODEL",
+        "Nodes": [
+          "bf8cd6ec02e142c288dc1900a201cce8",
+          "d54d9e7b713642bd8f5c54263c8cc89c"
+        ],
+        "Left": 595.33246002892668,
+        "Top": 340.30252726711706,
+        "Width": 1311.6465257463046,
+        "Height": 89.832586447620429,
+        "FontSize": 24.0,
+        "InitialTop": 379.30252726711706,
+        "InitialHeight": 146.83258644762043,
+        "TextblockHeight": 29.0,
+        "Background": "#FF48B9FF"
+      },
+      {
+        "Id": "6e2faccc3804485aa2ec4347457bb3aa",
+        "Title": "Background",
+        "Nodes": [
+          "f534f26a79d64766b04551d183635b48"
+        ],
+        "Left": 597.47579225710024,
+        "Top": 450.7757898697397,
+        "Width": 136.82333333333332,
+        "Height": 83.0,
+        "FontSize": 24.0,
+        "InitialTop": 489.7757898697397,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FFD3D3D3"
+      },
+      {
+        "Id": "a6513e78f62c41b3b4706ffc54b09fb5",
+        "Title": "Input",
+        "Nodes": [
+          "ecafa093e5d240b4a3e7c601250728d5"
+        ],
+        "Left": 749.98831063334319,
+        "Top": 452.70829179549764,
+        "Width": 175.0,
+        "Height": 83.0,
+        "FontSize": 24.0,
+        "InitialTop": 491.70829179549764,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FFB0C4DE"
+      },
+      {
+        "Id": "963671e731a540fa870cbbca5e0e49dc",
+        "Title": "Control",
+        "Nodes": [
+          "2cbba4919f654d2db6a37bac2e5bd6b1"
+        ],
+        "Left": 936.27236346356608,
+        "Top": 455.43716139604896,
+        "Width": 185.0,
+        "Height": 83.0,
+        "FontSize": 24.0,
+        "InitialTop": 494.43716139604896,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FF90EE90"
+      },
+      {
+        "Id": "210dbcae8e55459eba0fe7ae308c387b",
+        "Title": "To Revit",
+        "Nodes": [
+          "c2aa046427d74f4c865af943af62a0ad"
+        ],
+        "Left": 1134.986828757108,
+        "Top": 455.20095033981806,
+        "Width": 178.0,
+        "Height": 83.0,
+        "FontSize": 24.0,
+        "InitialTop": 494.20095033981806,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FFFFA07A"
+      },
+      {
+        "Id": "e15da233949946ffad03b4957490a43f",
+        "Title": "Annotation",
+        "Nodes": [
+          "e2d74b025c194cc4a7cc561b56625cc1"
+        ],
+        "Left": 1323.2284403882725,
+        "Top": 453.05183316028808,
+        "Width": 139.0,
+        "Height": 83.0,
+        "FontSize": 24.0,
+        "InitialTop": 492.05183316028808,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FF87CEFA"
+      },
+      {
+        "Id": "bc9caaf45b1a4b749185c904adde6bb5",
+        "Title": "Info",
+        "Nodes": [
+          "a1b87ca6ff314494ac15d2a859ec31bd"
+        ],
+        "Left": 1467.2588855567376,
+        "Top": 452.94921464761387,
+        "Width": 163.0,
+        "Height": 83.0,
+        "FontSize": 24.0,
+        "InitialTop": 491.94921464761387,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FFFFE4C4"
+      },
+      {
+        "Id": "efdf930be6e3403eb845db540a342692",
+        "Title": "Other",
+        "Nodes": [
+          "b29d47a12bd94e47aca51d41c9978fdc"
+        ],
+        "Left": 1639.4650483766159,
+        "Top": 452.22305352632168,
+        "Width": 164.0,
+        "Height": 83.0,
+        "FontSize": 24.0,
+        "InitialTop": 491.22305352632168,
+        "InitialHeight": 140.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FF71C6A8"
+      },
+      {
+        "Id": "97740365478341638852764e41f2e23f",
+        "Title": "To Revit",
+        "Nodes": [
+          "721e5e329afd46dbb8fd2ceea64ac188"
+        ],
+        "Left": 895.56047340969224,
+        "Top": 756.50796128395461,
+        "Width": 290.0,
+        "Height": 184.0,
+        "FontSize": 24.0,
+        "InitialTop": 795.50796128395461,
+        "InitialHeight": 145.0,
+        "TextblockHeight": 29.0,
+        "Background": "#FFFFA07A"
+      },
+      {
+        "Id": "9239ca91e377425abdc7e21f1a1d8f83",
+        "Title": "Background",
+        "Nodes": [
+          "031e0a0131e640c5b5e202c5d31c1ef2",
+          "50820e35ea4d4ac7add8cc3b05dc38d2",
+          "870e5d03bcc648d4862e9bafeccf94e8"
+        ],
+        "Left": 599.62094304214907,
+        "Top": 754.71568970159285,
+        "Width": 184.31013193298509,
+        "Height": 314.51005572299039,
+        "FontSize": 24.0,
+        "InitialTop": 793.71568970159285,
+        "InitialHeight": 352.51005572299039,
+        "TextblockHeight": 29.0,
+        "Background": "#FFD3D3D3"
+      },
+      {
+        "Id": "2f09b5c5ebb0422aac731b86cdbedae5",
+        "Title": "GNU License\r\n\r\nThis program is free software, you can redistribute it and/or modify it under the terms GNU General Public License as pubmished by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\r\n\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY, without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. \r\n\r\nYou should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/",
+        "Nodes": [],
+        "Left": 272.5,
+        "Top": 389.5,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "dbab1a6b99cb4c1eaecaa46769bae0fe",
+        "Title": "SHOUTOUTS!\r\n\r\nTo KAte and Sol Amour in this thread\r\nhttps://revitforum.org/showthread.php/38481-Dynamo-Disable-Analytical-Model",
+        "Nodes": [],
+        "Left": 270.55377041522308,
+        "Top": 672.81031827891877,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "bf8cd6ec02e142c288dc1900a201cce8",
+        "Title": "</Title>",
+        "Nodes": [],
+        "Left": 605.33246002892668,
+        "Top": 386.13511371473749,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "d54d9e7b713642bd8f5c54263c8cc89c",
+        "Title": "</Title>",
+        "Nodes": [],
+        "Left": 1832.9789857752312,
+        "Top": 379.30252726711706,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "f534f26a79d64766b04551d183635b48",
+        "Title": "for workflow",
+        "Nodes": [],
+        "Left": 607.47579225710024,
+        "Top": 489.7757898697397,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "ecafa093e5d240b4a3e7c601250728d5",
+        "Title": "for selection and whatnot",
+        "Nodes": [],
+        "Left": 759.98831063334319,
+        "Top": 491.70829179549764,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "2cbba4919f654d2db6a37bac2e5bd6b1",
+        "Title": "for sliders and other option",
+        "Nodes": [],
+        "Left": 946.27236346356608,
+        "Top": 494.43716139604896,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "c2aa046427d74f4c865af943af62a0ad",
+        "Title": "for changes made to Revit",
+        "Nodes": [],
+        "Left": 1144.986828757108,
+        "Top": 494.20095033981806,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "e2d74b025c194cc4a7cc561b56625cc1",
+        "Title": "for notes and titles",
+        "Nodes": [],
+        "Left": 1333.2284403882725,
+        "Top": 492.05183316028808,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "a1b87ca6ff314494ac15d2a859ec31bd",
+        "Title": "for general information",
+        "Nodes": [],
+        "Left": 1477.2588855567376,
+        "Top": 491.94921464761387,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "b29d47a12bd94e47aca51d41c9978fdc",
+        "Title": "for general other needs",
+        "Nodes": [],
+        "Left": 1649.4650483766159,
+        "Top": 491.22305352632168,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "fd02cc3ae5654f1499114bab65261bfa",
+        "Title": "in this python script there is a number '0' that indicates analytical model is initially turned off",
+        "Nodes": [],
+        "Left": 600.7074253259691,
+        "Top": 687.65046540425419,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      }
+    ],
+    "X": -518.64834873821849,
+    "Y": -431.93519424873432,
+    "Zoom": 0.9176910013576064
+  }
+}
