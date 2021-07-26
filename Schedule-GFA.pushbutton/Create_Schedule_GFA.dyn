@@ -2,7 +2,7 @@
   "Uuid": "121f28bf-611a-4a3b-9f6f-b13db29b13ce",
   "IsCustomNode": false,
   "Description": null,
-  "Name": "Create_Excel",
+  "Name": "Create_Schedule_GFA",
   "ElementResolver": {
     "ResolutionMap": {}
   },
@@ -216,7 +216,7 @@
     {
       "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
       "NodeType": "StringInputNode",
-      "InputValue": "ROOM SCHEDULE",
+      "InputValue": "GROSS FLOOR AREA",
       "Id": "cbd181cfd24644c0a99e5b9b390920cb",
       "Inputs": [],
       "Outputs": [
@@ -372,7 +372,7 @@
         "IsSetAsInput": false,
         "IsSetAsOutput": false,
         "Excluded": false,
-        "X": 511.07624650052014,
+        "X": 509.09791541486243,
         "Y": 1154.3476841838431
       }
     ],
@@ -539,7 +539,7 @@
         "Height": 550.4408650437897,
         "FontSize": 24.0,
         "InitialTop": 865.16709321088024,
-        "InitialHeight": 541.4408650437897,
+        "InitialHeight": 588.4408650437897,
         "TextblockHeight": 29.0,
         "Background": "#FFB0C4DE"
       },
@@ -726,8 +726,8 @@
         "Background": "#FFC1D676"
       }
     ],
-    "X": 321.58198749080555,
-    "Y": -92.1949872368121,
-    "Zoom": 0.50353434366463823
+    "X": -821.17513050787238,
+    "Y": -2486.928198229723,
+    "Zoom": 2.5273828209285467
   }
 }
